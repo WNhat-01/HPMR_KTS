@@ -33,6 +33,12 @@ report/*.fls
 report/*.fdb_latexmk
 report/*.synctex.gz
 
+# Large local demo videos (share via Google Drive link in VIDEO_DEMO_LINK.txt)
+*.mp4
+*.mov
+*.mkv
+*.avi
+
 # OS / Editor files
 .DS_Store
 Thumbs.db

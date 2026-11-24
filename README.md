@@ -134,4 +134,4 @@ Cho mỗi project (`.qpf`) trong `D:\HPMR_EE1009\`:
 ## 6. Checklist Đóng Gói Nộp Bài
 - [ ] File PDF báo cáo (**tối đa 15 trang**) đã chèn đủ ảnh RTL Viewer, Waveform ModelSim, Timing Analyzer và ảnh chạy kit.
 - [ ] File `.zip` chứa 4 thư mục project (`lab4_exp1_proc`, `lab4_exp2_proc_rom`, `lab5_exp1_proc_enhanced`, `lab5_exp1_system_fpga`) — nên xóa thư mục tạm `db/`, `incremental_db/`, `sim/work/` trước khi nén để file `.zip` nhẹ và sạch (giữ lại `rtl/`, `mem/`, `constraints/`, `sim/*.sv`, `sim/*.do`, `.qpf`, `.qsf`, và `output_files/*.sof` của Lab 5).
-- [ ] File Video demo (`.mp4`) rõ nét, nghe rõ tiếng, thấy rõ `SW[9]`, `KEY[0]`, `LEDR[8:0]`.
+- [ ] File Video demo: upload lên Google Drive (bật quyền *Anyone with the link — Viewer*), dán link vào [VIDEO_DEMO_LINK.txt](VIDEO_DEMO_LINK.txt) và vào trang bìa/mục 3.5 của [report/main.tex](report/main.tex).
