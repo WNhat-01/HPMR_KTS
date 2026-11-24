@@ -1,0 +1,39 @@
+# Quartus Prime build & temporary files
+db/
+incremental_db/
+greybox_tmp/
+hc_output/
+simulation/
+*.qws
+*.bak
+*.rpt.htm
+*.qdf
+*.cmp
+*.ppf
+*.bsf
+*.sip
+*.spd
+
+# ModelSim simulation artifacts
+**/sim/work/
+**/sim/transcript
+**/sim/vsim.wlf
+**/sim/wlft*
+**/sim/modelsim.ini
+*.wlf
+
+# LaTeX build artifacts (keep main.tex & main.pdf)
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.lof
+report/*.lot
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+desktop.ini

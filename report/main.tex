@@ -1,0 +1,867 @@
+% ============================================================================
+% BÁO CÁO BÀI TẬP LỚN - HỌC PHẦN MỞ RỘNG KỸ THUẬT SỐ (EE1009, HCMUT)
+% Hỗ trợ biên dịch tốt trên: Overleaf (pdfLaTeX/XeLaTeX) & MiKTeX / TeX Live
+% Quy định: Tối đa 15 trang (form này được căn gọn trong khoảng 12-14 trang)
+% ============================================================================
+\documentclass[11pt,a4paper]{article}
+
+% --- Mã hóa & Tiếng Việt (tự động thích ứng pdfLaTeX / XeLaTeX / LuaLaTeX) ---
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \usepackage[T5]{fontenc}
+  \usepackage[vietnamese]{babel}
+\else
+  \usepackage{fontspec}
+  \usepackage{polyglossia}
+  \setdefaultlanguage{vietnamese}
+\fi
+
+% --- Căn lề & Bố cục trang (căn gọn để chắc chắn <= 15 trang) ---
+\usepackage[a4paper, top=2.1cm, bottom=2.1cm, left=2.0cm, right=2.0cm]{geometry}
+\usepackage{setspace}
+\setstretch{1.12}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+
+% --- Gói đồ họa, bảng biểu, toán học, màu sắc ---
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage[table]{xcolor}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, fit, backgrounds, calc}
+\usepackage[unicode, colorlinks=true, linkcolor=hcmutBlue, urlcolor=hcmutBlue, citecolor=hcmutBlue]{hyperref}
+
+% --- Bảng màu học thuật (tông xanh HCMUT) ---
+\definecolor{hcmutBlue}{RGB}{0, 74, 153}
+\definecolor{hcmutLight}{RGB}{235, 243, 252}
+\definecolor{borderGray}{RGB}{140, 150, 165}
+\definecolor{boxBg}{RGB}{248, 250, 252}
+\definecolor{todoRed}{RGB}{192, 42, 42}
+\definecolor{todoBg}{RGB}{255, 243, 243}
+\definecolor{passGreen}{RGB}{20, 125, 60}
+\definecolor{codeBg}{RGB}{244, 246, 248}
+
+% --- Căn chỉnh tiêu đề chương / mục gọn đẹp ---
+\titleformat{\section}
+  {\large\bfseries\color{hcmutBlue}}
+  {\thesection.}{0.5em}{}
+  [\vspace{-0.4em}\color{hcmutBlue}\rule{\linewidth}{0.8pt}]
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{hcmutBlue!85!black}}
+  {\thesubsection.}{0.5em}{}
+\titlespacing*{\subsection}{0pt}{8pt}{4pt}
+
+\captionsetup{
+  font=small,
+  labelfont={bf,color=hcmutBlue},
+  skip=4pt
+}
+\setlist[itemize]{topsep=2pt, itemsep=2pt, leftmargin=1.4em}
+\setlist[enumerate]{topsep=2pt, itemsep=2pt, leftmargin=1.5em}
+
+% --- Header & Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\color{gray}HCMUT -- Khoa Điện - Điện tử}
+\fancyhead[R]{\footnotesize\color{gray}HPMR Kỹ Thuật Số (EE1009) -- Lab 4 \& Lab 5}
+\fancyfoot[L]{\footnotesize\color{gray}Báo cáo Bài tập lớn}
+\fancyfoot[R]{\footnotesize\color{gray}Trang \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================================
+% CÁC MACRO HỖ TRỢ TỰ ĐIỀN & TỰ ĐỘNG NHẬN HÌNH ẢNH
+% ============================================================================
+
+% 1. Đánh dấu những chỗ bạn cần tự điền (xóa \todo{...} thay bằng nội dung thật)
+\newcommand{\todo}[1]{%
+  \colorbox{todoBg}{\textcolor{todoRed}{\textbf{[TỰ ĐIỀN: #1]}}}%
+}
+
+% 2. Khung chữ nhật cho các đoạn nhận xét bạn tự viết
+\newcommand{\todobox}[2]{%
+  \begin{center}
+    \begin{tikzpicture}
+      \node[
+        draw=todoRed!70, dashed, line width=0.8pt,
+        fill=todoBg, rounded corners=3pt,
+        text width=\dimexpr\linewidth-16pt\relax,
+        inner sep=7pt, align=left
+      ] {
+        \textbf{\textcolor{todoRed}{#1}}\\[3pt]
+        \small\textcolor{black!80}{#2}
+      };
+    \end{tikzpicture}
+  \end{center}
+}
+
+% 3. Chèn 1 hình ảnh tự động:
+%    - Nếu file đã có trong thư mục figures/, tự động hiển thị ảnh thật!
+%    - Nếu chưa có, tự vẽ khung placeholder đúng kích thước để ước lượng số trang.
+%    Cú pháp: \reportfigure[chiều cao]{ten_file.png}{Chú thích}{nhan_label}{Hướng dẫn chụp}
+\newcommand{\reportfigure}[5][5.4cm]{%
+  \begin{figure}[H]
+    \centering
+    \IfFileExists{figures/#2}{%
+      \includegraphics[width=0.96\linewidth, height=#1, keepaspectratio]{figures/#2}%
+    }{%
+      \begin{tikzpicture}
+        \node[
+          draw=borderGray, dashed, line width=0.9pt,
+          fill=boxBg, rounded corners=4pt,
+          minimum width=0.95\linewidth, minimum height=#1,
+          text width=0.88\linewidth, align=center
+        ] {
+          \textcolor{hcmutBlue}{\textbf{[CHỖ CHÈN HÌNH ẢNH --- \texttt{\detokenize{figures/#2}}]}}\\[6pt]
+          \small\textcolor{black!75}{#5}\\[4pt]
+          \footnotesize\textcolor{gray}{\textit{(Chỉ cần chép ảnh đúng tên \texttt{\detokenize{#2}} vào thư mục \texttt{figures/} rồi biên dịch lại --- LaTeX sẽ tự động thay khung này bằng ảnh thật.)}}
+        };
+      \end{tikzpicture}%
+    }
+    \caption{#3}
+    \label{#4}
+  \end{figure}
+}
+
+% 4. Chèn 2 hình ảnh (trên - dưới) trong cùng 1 figure (dùng cho Waveform tách 2 frame)
+%    Cú pháp: \reporttwofigures[chiều cao mỗi ảnh]{fileA}{capA}{guideA}{fileB}{capB}{guideB}{capChinh}{label}
+\newcommand{\reporttwofigures}[9][4.2cm]{%
+  \begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.96\linewidth}
+      \centering
+      \IfFileExists{figures/#2}{%
+        \includegraphics[width=\linewidth, height=#1, keepaspectratio]{figures/#2}%
+      }{%
+        \begin{tikzpicture}
+          \node[
+            draw=borderGray, dashed, line width=0.9pt,
+            fill=boxBg, rounded corners=4pt,
+            minimum width=\linewidth, minimum height=#1,
+            text width=0.9\linewidth, align=center
+          ] {
+            \textcolor{hcmutBlue}{\textbf{[CHỖ CHÈN ẢNH (a) --- \texttt{\detokenize{figures/#2}}]}}\\[4pt]
+            \small\textcolor{black!75}{#4}
+          };
+        \end{tikzpicture}%
+      }
+      \caption{#3}
+    \end{subfigure}
+    \vspace{4pt}
+    \begin{subfigure}[b]{0.96\linewidth}
+      \centering
+      \IfFileExists{figures/#5}{%
+        \includegraphics[width=\linewidth, height=#1, keepaspectratio]{figures/#5}%
+      }{%
+        \begin{tikzpicture}
+          \node[
+            draw=borderGray, dashed, line width=0.9pt,
+            fill=boxBg, rounded corners=4pt,
+            minimum width=\linewidth, minimum height=#1,
+            text width=0.9\linewidth, align=center
+          ] {
+            \textcolor{hcmutBlue}{\textbf{[CHỖ CHÈN ẢNH (b) --- \texttt{\detokenize{figures/#5}}]}}\\[4pt]
+            \small\textcolor{black!75}{#7}
+          };
+        \end{tikzpicture}%
+      }
+      \caption{#6}
+    \end{subfigure}
+    \caption{#8}
+    \label{#9}
+  \end{figure}
+}
+
+% Định dạng mã lệnh inline gọn
+\newcommand{\code}[1]{\texttt{\small #1}}
+
+% ============================================================================
+\begin{document}
+
+% ============================================================================
+% TRANG 1: TRANG BÌA (CHUẨN HCMUT)
+% ============================================================================
+\begin{titlepage}
+  \thispagestyle{empty}
+  % Khung viền kép quanh trang bìa
+  \begin{tikzpicture}[remember picture, overlay]
+    \draw[hcmutBlue, line width=2pt]
+      ([xshift=1.4cm, yshift=-1.4cm]current page.north west)
+      rectangle
+      ([xshift=-1.4cm, yshift=1.4cm]current page.south east);
+    \draw[hcmutBlue, line width=0.6pt]
+      ([xshift=1.55cm, yshift=-1.55cm]current page.north west)
+      rectangle
+      ([xshift=-1.55cm, yshift=1.55cm]current page.south east);
+  \end{tikzpicture}
+
+  \centering
+  \vspace*{0.4cm}
+  {\normalsize\bfseries ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH}\\[4pt]
+  {\large\bfseries TRƯỜNG ĐẠI HỌC BÁCH KHOA}\\[4pt]
+  {\normalsize\bfseries\color{hcmutBlue} KHOA ĐIỆN -- ĐIỆN TỬ}\\[1.0cm]
+
+  % Logo HCMUT (tự hiện nếu bạn đặt file figures/logo_hcmut.png)
+  \IfFileExists{figures/logo_hcmut.png}{%
+    \includegraphics[height=2.8cm]{figures/logo_hcmut.png}\\[0.9cm]
+  }{%
+    \begin{tikzpicture}
+      \node[draw=borderGray, dashed, rounded corners=4pt, fill=boxBg,
+            minimum width=4.8cm, minimum height=2.6cm, text width=4.5cm, align=center]
+            {\footnotesize\color{gray}Logo HCMUT\\(tùy chọn)\\\texttt{figures/logo\_hcmut.png}};
+    \end{tikzpicture}\\[0.9cm]
+  }
+
+  {\Large\bfseries BÁO CÁO BÀI TẬP LỚN}\\[6pt]
+  {\large\bfseries HỌC PHẦN MỞ RỘNG --- KỸ THUẬT SỐ (EE1009)}\\[1.1cm]
+
+  \begin{tikzpicture}
+    \node[
+      draw=hcmutBlue, line width=1.2pt, fill=hcmutLight,
+      rounded corners=5pt, text width=0.86\linewidth,
+      inner sep=12pt, align=center
+    ] {
+      \large\bfseries\color{hcmutBlue}
+      THIẾT KẾ BỘ XỬ LÝ ĐƠN GIẢN (LAB 4) VÀ BỘ XỬ LÝ CẢI TIẾN\\
+      TÍCH HỢP RAM \& NGOẠI VI TRÊN FPGA DE10-STANDARD (LAB 5)
+    };
+  \end{tikzpicture}
+
+  \vspace{1.4cm}
+
+  % Bảng thông tin giảng viên & sinh viên thực hiện
+  \begin{minipage}{0.88\linewidth}
+    \renewcommand{\arraystretch}{1.45}
+    \begin{tabularx}{\linewidth}{@{}p{4.5cm} X@{}}
+      \textbf{Giảng viên hướng dẫn:} & Phan Võ Kim Anh \\
+      \textbf{Sinh viên thực hiện:}  & \todo{Họ và tên sinh viên} \\
+      \textbf{Mã số sinh viên:}      & \todo{MSSV (vd: 241xxxx)} \\
+      \textbf{Lớp / Nhóm:}           & \todo{Lớp / Mã nhóm (nếu có)} \\
+      % --- Nếu làm theo nhóm, bỏ dấu % ở các dòng dưới để thêm thành viên ---
+      % \textbf{Thành viên 2:}       & Họ và tên -- MSSV \\
+      % \textbf{Thành viên 3:}       & Họ và tên -- MSSV \\
+      % \textbf{Thành viên 4:}       & Họ và tên -- MSSV \\
+      \textbf{Kit thực nghiệm:}      & Terasic DE10-Standard (Cyclone V \code{5CSXFC6D6F31C6}) \\
+      \textbf{Công cụ sử dụng:}      & Intel Quartus Prime 18.1 Lite, ModelSim-Altera 10.5b \\
+      \textbf{Video Demo sản phẩm:}  & \todo{Nộp kèm .mp4 hoặc dán link Video} \\
+    \end{tabularx}
+  \end{minipage}
+
+  \vfill
+  {\normalsize\bfseries HỌC KỲ HK261 --- NĂM HỌC 2026 -- 2027}\\[4pt]
+  {\normalsize TP. Hồ Chí Minh, \todo{Tháng .../2026}}
+  \vspace*{0.4cm}
+\end{titlepage}
+
+% ============================================================================
+% TRANG 2: MỤC LỤC & TỔNG QUAN PHẠM VI THIẾT KẾ
+% ============================================================================
+\setcounter{page}{2}
+{\small
+  \renewcommand{\contentsname}{MỤC LỤC}
+  \tableofcontents
+}
+\vspace{0.5cm}
+
+\section{Tổng quan bài toán và môi trường thực hiện}
+Báo cáo trình bày phương án thiết kế, máy trạng thái hữu hạn (FSM), sơ đồ mạch (Schematic / RTL Viewer), kết quả mô phỏng chức năng (Waveform) và phân tích thời gian (Timing Analyzer) cho trọn bộ hai bài thí nghiệm theo yêu cầu Học phần mở rộng môn Kỹ Thuật Số (\code{EE1009}):
+\begin{itemize}
+  \item \textbf{Lab 4 --- Bộ xử lý đơn giản (A Simple Processor):} Thiết kế bộ xử lý 9-bit hỗ trợ 4 lệnh cơ bản (\code{mv}, \code{mvi}, \code{add}, \code{sub}) ở Experiment 1, sau đó tích hợp bộ đếm địa chỉ 5-bit và bộ nhớ chỉ đọc \code{ROM 32x9} (theo đính chính của giảng viên) để nạp và chạy chương trình tự động từ file \code{my\_ROM.mif} (Pre-Lab 4 Exercise 1) ở Experiment 2.
+  \item \textbf{Lab 5 --- Bộ xử lý cải tiến \& Hệ thống FPGA 50 MHz (An Enhanced Processor):} Nâng cấp thanh ghi \code{R7} thành Program Counter, bổ sung các thanh ghi giao tiếp bộ nhớ (\code{ADDR}, \code{DOUT}, \code{W}) cùng 3 lệnh mới (\code{ld}, \code{st}, \code{mvnz}), kết nối \code{RAM 1-PORT (128x9)} (vùng địa chỉ \code{A8A7 = 00}), thanh ghi ngoại vi \code{LEDs} (vùng địa chỉ \code{A8A7 = 01}), mạch đồng bộ 2 Flip-Flop cho công tắc \code{SW[9]}, và triển khai chạy thực tế ở xung nhịp \textbf{50 MHz} trên kit \textbf{Terasic DE10-Standard}.
+\end{itemize}
+
+\begin{table}[H]
+  \centering
+  \caption{Tóm tắt cấu trúc 4 project Quartus Prime 18.1 trong gói nộp bài}
+  \label{tab:overview}
+  \small
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{@{}l l X@{}}
+    \toprule
+    \textbf{Thư mục Project} & \textbf{Top-Level} & \textbf{Nội dung chính} \\
+    \midrule
+    \code{lab4\_exp1\_proc} & \code{proc} & Simple Processor 9-bit, 4 lệnh, FSM 4 trạng thái (\code{T0}--\code{T3}). \\
+    \code{lab4\_exp2\_proc\_rom} & \code{lab4\_exp2\_top} & Kết nối \code{counter5} $\rightarrow$ \code{my\_rom (32x9)} $\rightarrow$ \code{proc}, chạy \code{my\_ROM.mif}. \\
+    \code{lab5\_exp1\_proc\_enhanced} & \code{proc\_enhanced} & Enhanced Processor 9-bit, 7 lệnh, \code{R7 = PC}, FSM 6 trạng thái (\code{T0}--\code{T5}). \\
+    \code{lab5\_exp1\_system\_fpga} & \code{lab5\_system\_top} & Hệ thống hoàn chỉnh trên DE10-Standard @ 50 MHz: RAM M10K, LEDs, 2-FF sync. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\newpage
+
+% ============================================================================
+% PHẦN 1: LAB 4 - BỘ XỬ LÝ ĐƠN GIẢN
+% ============================================================================
+\section{Lab 4: Thiết kế Bộ xử lý đơn giản (A Simple Processor)}
+
+\subsection{Phương án thiết kế và Tập lệnh (Lab 4 --- Experiment 1)}
+Bộ xử lý 9-bit \code{proc} được thiết kế bằng SystemVerilog theo cấu trúc RTL gồm hai khối chính: \textbf{Datapath} và \textbf{Control Unit (FSM)}.
+\begin{itemize}
+  \item \textbf{8 thanh ghi đa dụng 9-bit (\code{R0}--\code{R7}, module \code{regn}):} Chọn ghi bằng tín hiệu \code{Rin[7:0]} và chọn xuất lên bus bằng \code{Rout[7:0]} thông qua hai bộ giải mã \code{dec3to8} (\code{decX}, \code{decY}).
+  \item \textbf{Khối số học (\code{addsub}):} Kết hợp thanh ghi tạm \code{A} (\code{Ain}) và thanh ghi kết quả \code{G} (\code{Gin}, \code{Gout}), tính \code{A + BusWires} khi \code{AddSub = 0} và \code{A - BusWires} khi \code{AddSub = 1} (biểu diễn số bù 2, 9-bit).
+  \item \textbf{Thanh ghi lệnh \code{IR} (9-bit, \code{IRin}):} Nhận mã lệnh định dạng \code{III\_XXX\_YYY} từ \code{DIN[8:0]}, trong đó \code{IR[8:6]} là mã lệnh (\code{I}), \code{IR[5:3]} là thanh ghi đích (\code{Rx}), \code{IR[2:0]} là thanh ghi nguồn (\code{Ry}).
+  \item \textbf{Bus dữ liệu 9-bit (\code{BusWires}):} Thực hiện bằng bộ dồn kênh 10-sang-1 chọn một nguồn trong tập \{\code{R0}--\code{R7}, \code{G}, \code{DIN}\} theo vector điều khiển one-hot \{\code{Rout[7:0]}, \code{Gout}, \code{DINout}\}.
+\end{itemize}
+
+\begin{table}[H]
+  \centering
+  \caption{Tập lệnh 9-bit của Simple Processor (Lab 4)}
+  \label{tab:lab4_isa}
+  \small
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}c l l c@{}}
+    \toprule
+    \textbf{Opcode (\code{IR[8:6]})} & \textbf{Lệnh Assembly} & \textbf{Hoạt động thực thi} & \textbf{Số chu kỳ} \\
+    \midrule
+    \code{000} & \code{mv Rx, Ry}  & $\text{Rx} \leftarrow [\text{Ry}]$ & 2 (\code{T0}--\code{T1}) \\
+    \code{001} & \code{mvi Rx, \#D} & $\text{Rx} \leftarrow \text{DIN}$ (hằng số 9-bit ở chu kỳ kế tiếp) & 2 (\code{T0}--\code{T1}) \\
+    \code{010} & \code{add Rx, Ry} & $\text{Rx} \leftarrow [\text{Rx}] + [\text{Ry}]$ & 4 (\code{T0}--\code{T3}) \\
+    \code{011} & \code{sub Rx, Ry} & $\text{Rx} \leftarrow [\text{Rx}] - [\text{Ry}]$ & 4 (\code{T0}--\code{T3}) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% --- Sơ đồ khối kiến trúc Lab 4 vẽ sẵn bằng TikZ ---
+\begin{figure}[H]
+  \centering
+  \resizebox{0.98\linewidth}{!}{%
+    \begin{tikzpicture}[
+      font=\footnotesize,
+      >=Stealth,
+      reg/.style={draw=hcmutBlue, thick, fill=hcmutLight, minimum width=1.7cm, minimum height=0.8cm, align=center, rounded corners=2pt},
+      blk/.style={draw=hcmutBlue!80!black, thick, fill=white, minimum width=2.0cm, minimum height=0.85cm, align=center, rounded corners=2pt},
+      ctrl/.style={draw=hcmutBlue, thick, fill=blue!6, text width=9.2cm, minimum height=1.2cm, align=center, rounded corners=3pt},
+      bus/.style={draw=black, line width=1.4pt, ->}
+    ]
+      % Top & datapath blocks with generous spacing
+      \node[reg, minimum width=1.6cm] (din) at (0, 3.3) {\textbf{DIN[8:0]}};
+      \node[reg, minimum width=1.6cm] (ir)  at (0, 1.8) {\textbf{IR (9-bit)}\\{\scriptsize \code{IRin}}};
+      \node[blk, fill=hcmutLight, minimum width=2.8cm, minimum height=1.3cm] (mux) at (3.6, 2.55) {\textbf{10-to-1 MUX}\\{\scriptsize \code{Rout, Gout, DINout}}};
+
+      % Registers R0..R7
+      \node[reg, minimum width=2.3cm, minimum height=1.3cm] (rf) at (8.9, 2.55) {\textbf{R0 -- R7}\\{\scriptsize 8 $\times$ 9-bit (\code{Rin})}};
+
+      % ALU path
+      \node[reg, minimum width=1.6cm] (rega) at (12.1, 3.15) {\textbf{Reg A}\\{\scriptsize \code{Ain}}};
+      \node[blk, minimum width=1.9cm, minimum height=0.85cm] (alu) at (14.6, 2.55) {\textbf{AddSub}\\{\scriptsize \code{A $\pm$ Bus}}};
+      \node[reg, minimum width=1.6cm] (regg) at (17.1, 2.55) {\textbf{Reg G}\\{\scriptsize \code{Gin}}};
+
+      % Control unit centered neatly below
+      \node[ctrl] (cu) at (7.0, -0.55) {\textbf{Control Unit (FSM \code{T0}--\code{T3}) + 2 $\times$ \code{dec3to8}}\\[2pt]
+        {\scriptsize \code{IRin, Rin[7:0], Rout[7:0], Ain, Gin, Gout, DINout, AddSub, Done}}};
+
+      % Inputs to CU (below IR wire) & Done output positioned cleanly relative to CU
+      \node[align=right, anchor=east] (in_cu) at ([xshift=-0.9cm, yshift=-0.25cm]cu.west) {\code{Run, Resetn}\\\code{Clock}};
+      \draw[->, thick] (in_cu.east) -- ([yshift=-0.25cm]cu.west);
+
+      \node[align=left, right=1.1cm of cu.east] (out_done) {\textbf{\code{Done}}};
+      \draw[->, thick] (cu.east) -- (out_done.west);
+
+      % DIN -> IR and MUX
+      \draw[bus] (din.south) -- (ir.north);
+      \draw[bus] (din.east) -| ([xshift=-0.45cm]mux.west) -- (mux.west);
+      \draw[->, thick] (ir.south) |- ([yshift=0.35cm]cu.west) node[pos=0.72, above=1pt] {\scriptsize \code{IR[8:0]}};
+
+      % BusWires trunk
+      \draw[bus] (mux.east) -- node[above=2pt] {\scriptsize \code{BusWires[8:0]}} (rf.west);
+      \draw[bus] (rf.east) -- (10.6, 2.55) |- (rega.west);
+      \draw[bus] (10.6, 2.55) |- ([yshift=-0.22cm]alu.west);
+      \draw[bus] (rega.east) -| (13.25, 2.78) -- ([yshift=0.22cm]alu.west);
+      \draw[bus] (alu.east) -- (regg.west);
+
+      % Feedback R0..R7 and G back to MUX
+      \draw[bus] (rf.north) -- ++(0, 0.75) -| ([xshift=0.55cm]mux.north) node[pos=0.25, above] {\scriptsize \code{R0..R7}};
+      \draw[bus] (regg.north) -- ++(0, 1.45) -| ([xshift=-0.55cm]mux.north) node[pos=0.25, above] {\scriptsize \code{G[8:0]}};
+
+      % Control arrows dashed
+      \draw[->, dashed, hcmutBlue] (cu.north) -- ++(0, 0.55) coordinate (ctrlbus);
+      \draw[->, dashed, hcmutBlue] (ctrlbus) -| (mux.south);
+      \draw[->, dashed, hcmutBlue] (ctrlbus) -| (rf.south);
+      \draw[->, dashed, hcmutBlue] (ctrlbus) -| (rega.south);
+      \draw[->, dashed, hcmutBlue] (ctrlbus) -| (alu.south);
+      \draw[->, dashed, hcmutBlue] (ctrlbus) -| (regg.south);
+    \end{tikzpicture}%
+  }
+  \caption{Sơ đồ khối kiến trúc Datapath và Control Unit của Simple Processor (\code{proc})}
+  \label{fig:lab4_arch}
+\end{figure}
+
+\reportfigure[4.8cm]{lab4_exp1_rtl.png}
+  {Sơ đồ mạch tổng hợp (RTL Viewer) của \code{lab4\_exp1\_proc} trong Quartus Prime 18.1}
+  {fig:lab4_exp1_rtl}
+  {Mở \texttt{lab4\_exp1\_proc.qpf} trong Quartus 18.1 $\rightarrow$ \textbf{Analysis \& Synthesis} $\rightarrow$ \textbf{Tools $\rightarrow$ Netlist Viewers $\rightarrow$ RTL Viewer} $\rightarrow$ Fit in Window và chụp ảnh lưu thành \texttt{lab4\_exp1\_rtl.png}.}
+
+\subsection{Thiết kế máy trạng thái hữu hạn FSM (Control Unit --- \code{T0}--\code{T3})}
+Khối điều khiển sử dụng bộ đếm trạng thái 4 bước (\code{T0}, \code{T1}, \code{T2}, \code{T3}) được reset bất đồng bộ mức thấp (\code{Resetn = 0}) về \code{T0}. Khi \code{Run = 1} tại \code{T0}, bộ xử lý chốt mã lệnh vào \code{IR} và chuyển sang \code{T1}. Các lệnh 2 chu kỳ (\code{mv}, \code{mvi}) kết thúc ngay tại \code{T1} (\code{Done = 1}); các lệnh số học (\code{add}, \code{sub}) đi qua \code{T2} và kết thúc tại \code{T3}.
+
+% --- Sơ đồ FSM Lab 4 vẽ sẵn bằng TikZ ---
+\begin{figure}[H]
+  \centering
+  \resizebox{0.86\linewidth}{!}{%
+    \begin{tikzpicture}[
+      font=\small,
+      >=Stealth,
+      state/.style={circle, draw=hcmutBlue, very thick, fill=hcmutLight, minimum size=1.15cm, font=\bfseries\color{hcmutBlue}}
+    ]
+      \node[state] (T0) at (0, 0) {T0};
+      \node[state] (T1) at (3.6, 0) {T1};
+      \node[state] (T2) at (7.2, 0) {T2};
+      \node[state] (T3) at (10.8, 0) {T3};
+
+      % Reset entry
+      \draw[->, thick] (-2.2, 0) -- node[above, pos=0.42] {\scriptsize \code{Resetn=0}} (T0);
+      % Self loop T0
+      \draw[->, thick] (T0) edge[loop above, looseness=6] node[above] {\scriptsize \code{Run=0}} (T0);
+      % Forward transitions
+      \draw[->, thick] (T0) -- node[above] {\scriptsize \code{Run=1}} node[below] {\scriptsize \code{IRin=1}} (T1);
+      \draw[->, thick] (T1) -- node[above] {\scriptsize \code{add, sub}} node[below] {\scriptsize (\code{Done=0})} (T2);
+      \draw[->, thick] (T2) -- node[above] {\scriptsize luôn chuyển} (T3);
+      % Return transitions
+      \draw[->, thick, hcmutBlue] (T1.north) to[bend right=40] node[above] {\scriptsize \code{mv, mvi} (\code{Done=1})} (T0.north east);
+      \draw[->, thick, hcmutBlue] (T3.south) to[bend left=24] node[below] {\scriptsize \code{Done=1} (ghi kết quả \code{G} $\rightarrow$ \code{Rx})} (T0.south);
+    \end{tikzpicture}%
+  }
+  \caption{Biểu đồ chuyển trạng thái FSM của Simple Processor (Lab 4 --- \code{T0}--\code{T3})}
+  \label{fig:lab4_fsm}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{Bảng trạng thái và các tín hiệu điều khiển tích cực (\code{= 1}) của \code{proc}}
+  \label{tab:lab4_fsm}
+  \small
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabularx}{\linewidth}{@{}c l X c@{}}
+    \toprule
+    \textbf{Trạng thái} & \textbf{Lệnh / Điều kiện} & \textbf{Tín hiệu điều khiển tích cực (\code{= 1})} & \textbf{Kế tiếp} \\
+    \midrule
+    \code{T0} & Mọi lệnh & \code{IRin} & \code{Run ? T1 : T0} \\
+    \code{T1} & \code{mv} (\code{000}) & \code{Rout = Yreg}, \code{Rin = Xreg}, \code{Done} & \code{T0} \\
+    \code{T1} & \code{mvi} (\code{001}) & \code{DINout}, \code{Rin = Xreg}, \code{Done} & \code{T0} \\
+    \code{T1} & \code{add} (\code{010}), \code{sub} (\code{011}) & \code{Rout = Xreg}, \code{Ain} & \code{T2} \\
+    \code{T2} & \code{add} (\code{010}) & \code{Rout = Yreg}, \code{Gin} (\code{AddSub = 0}) & \code{T3} \\
+    \code{T2} & \code{sub} (\code{011}) & \code{Rout = Yreg}, \code{AddSub}, \code{Gin} & \code{T3} \\
+    \code{T3} & \code{add} (\code{010}), \code{sub} (\code{011}) & \code{Gout}, \code{Rin = Xreg}, \code{Done} & \code{T0} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Kết quả mô phỏng và tổng hợp (Lab 4 --- Experiment 1)}
+Testbench \code{tb\_proc.sv} trên ModelSim 10.5b kiểm chứng đầy đủ chuỗi lệnh chuẩn theo Figure 2 của tài liệu Lab 4: \code{mvi R0,\#5} (\code{R0 = 0x005}) $\rightarrow$ \code{mv R1,R0} (\code{R1 = 0x005}) $\rightarrow$ \code{add R0,R1} (\code{R0 = 0x00A}) $\rightarrow$ \code{sub R0,R0} (\code{R0 = 0x000}), đồng thời kiểm chứng phép toán số âm 9-bit bù 2 (\code{mvi R2,\#-6} $\Rightarrow$ \code{0x1FA}, \code{add R1,R2} $\Rightarrow$ \code{5 + (-6) = -1 = 0x1FF}). Tất cả kiểm tra tự động đạt \textcolor{passGreen}{\textbf{PASS (0 errors, 0 warnings)}}; tổng hợp trên Quartus 18.1 đạt \textbf{0 errors, 0 warnings} (209 logic cells).
+
+\reportfigure[5.2cm]{lab4_exp1_wave.png}
+  {Dạng sóng mô phỏng ModelSim của Lab 4 --- Exp 1 (\code{tb\_proc}): \code{DIN/IR} hệ Octal, thanh ghi hệ Hex}
+  {fig:lab4_exp1_wave}
+  {Chạy \texttt{do run\_sim.do} trong \texttt{lab4\_exp1\_proc/sim}, lưu ảnh chụp cửa sổ Wave thành \texttt{lab4\_exp1\_wave.png}.}
+
+\subsection{Hệ thống kết nối ROM 32x9 và Bộ đếm 5-bit (Lab 4 --- Experiment 2)}
+Hệ thống mở rộng (\code{lab4\_exp2\_top.sv}) kết nối bộ xử lý \code{proc} (chạy xung nhịp \code{PClock}) với bộ đếm địa chỉ 5-bit \code{counter5} và bộ nhớ chỉ đọc \code{my\_rom} kích thước \code{32 words $\times$ 9-bit} (chuyển từ RAM sang ROM theo đính chính của giảng viên), cùng hoạt động theo xung nhịp \code{MClock}. Bộ nhớ ROM có thanh ghi chốt địa chỉ 5-bit ở ngõ vào (\code{posedge MClock}) và ngõ ra tổ hợp 9-bit \code{DATAOUT} nối trực tiếp vào \code{DIN} của bộ xử lý.
+
+% --- Sơ đồ khối Lab 4 Exp 2 vẽ sẵn bằng TikZ ---
+\begin{figure}[H]
+  \centering
+  \resizebox{0.95\linewidth}{!}{%
+    \begin{tikzpicture}[
+      font=\small,
+      >=Stealth,
+      blk/.style={draw=hcmutBlue, very thick, fill=hcmutLight, minimum width=3.3cm, minimum height=1.55cm, align=center, rounded corners=3pt}
+    ]
+      \node[blk] (cnt) at (0, 0) {\textbf{5-bit Counter}\\\code{counter5}\\{\scriptsize (\code{MClock, Resetn})}};
+      \node[blk] (rom) at (6.0, 0) {\textbf{32 $\times$ 9 ROM}\\\code{my\_rom}\\{\scriptsize (\code{my\_ROM.mif}, reg addr)}};
+      \node[blk] (cpu) at (12.6, 0) {\textbf{Simple Processor}\\\code{proc}\\{\scriptsize (\code{PClock, Resetn, Run})}};
+
+      \draw[->, very thick] (cnt.east) -- node[above=2pt] {\scriptsize \code{rom\_addr[4:0]}} (rom.west);
+      \draw[->, very thick] (rom.east) -- node[above=2pt] {\scriptsize \code{rom\_data[8:0]}} node[below=2pt] {\scriptsize ($\rightarrow$ \code{DIN})} (cpu.west);
+
+      % Clocks and controls
+      \draw[->, thick] (-2.6, 0.35) node[left] {\code{MClock}} -- ([yshift=0.35cm]cnt.west);
+      \draw[->, thick] (-2.0, 0.35) |- (6.0, 1.4) -- (rom.north);
+      \draw[->, thick] (-2.6, -0.35) node[left] {\code{Resetn}} -- ([yshift=-0.35cm]cnt.west);
+      \draw[->, thick] (-1.7, -0.35) |- (12.6, -1.4) -- (cpu.south);
+      \draw[->, thick] (11.8, 1.5) node[above] {\code{PClock}} -- ([xshift=-0.8cm]cpu.north);
+      \draw[->, thick] (13.4, 1.5) node[above] {\code{Run}} -- ([xshift=0.8cm]cpu.north);
+
+      % Outputs
+      \draw[->, very thick] ([yshift=0.3cm]cpu.east) -- ++(1.4, 0) node[right] {\code{Bus[8:0]}};
+      \draw[->, thick] ([yshift=-0.3cm]cpu.east) -- ++(1.4, 0) node[right] {\code{Done}};
+    \end{tikzpicture}%
+  }
+  \caption{Sơ đồ khối hệ thống Bộ xử lý kết nối ROM \code{32x9} và Bộ đếm 5-bit (Lab 4 --- Exp 2)}
+  \label{fig:lab4_exp2_sys}
+\end{figure}
+
+Chương trình nạp vào \code{my\_ROM.mif} được mã hóa theo đúng danh sách lệnh của \textbf{Pre-Lab 4 --- Exercise 1} (Bảng~\ref{tab:lab4_mif}). Lưu ý hai hằng số trong lệnh \code{mvi} chiếm ô nhớ kế tiếp ngay sau từ lệnh: \code{\#5 = 000\_000\_101} (\code{005} octal) và \code{\#-6 = 111\_111\_010} (\code{772} octal / \code{0x1FA} bù 2 9-bit).
+
+\begin{table}[H]
+  \centering
+  \caption{Bảng mã hóa chương trình nạp trong \code{my\_ROM.mif} (Pre-Lab 4 --- Exercise 1)}
+  \label{tab:lab4_mif}
+  \small
+  \renewcommand{\arraystretch}{1.08}
+  \begin{tabular}{@{}c l l c c c@{}}
+    \toprule
+    \textbf{Địa chỉ} & \textbf{Lệnh Assembly} & \textbf{Ý nghĩa} & \textbf{Nhị phân (\code{III\_XXX\_YYY})} & \textbf{Octal} & \textbf{Hex} \\
+    \midrule
+    \code{0} & \code{mv R1, R4}   & $\text{R1} \leftarrow [\text{R4}]$         & \code{000\_001\_100} & \code{014} & \code{00C} \\
+    \code{1} & \code{mv R3, R2}   & $\text{R3} \leftarrow [\text{R2}]$         & \code{000\_011\_010} & \code{032} & \code{01A} \\
+    \code{2} & \code{mvi R2, \#5} & $\text{R2} \leftarrow +5$ (từ lệnh)        & \code{001\_010\_000} & \code{120} & \code{050} \\
+    \code{3} & \code{\#5}         & Hằng số $+5$ (9-bit)                       & \code{000\_000\_101} & \code{005} & \code{005} \\
+    \code{4} & \code{mvi R4, \#-6}& $\text{R4} \leftarrow -6$ (từ lệnh)        & \code{001\_100\_000} & \code{140} & \code{060} \\
+    \code{5} & \code{\#-6}        & Hằng số $-6$ (bù 2 9-bit)                  & \code{111\_111\_010} & \code{772} & \code{1FA} \\
+    \code{6} & \code{add R3, R7}  & $\text{R3} \leftarrow [\text{R3}]+[\text{R7}]$ & \code{010\_011\_111} & \code{237} & \code{09F} \\
+    \code{7} & \code{add R2, R0}  & $\text{R2} \leftarrow [\text{R2}]+[\text{R0}]$ & \code{010\_010\_000} & \code{220} & \code{090} \\
+    \code{8} & \code{sub R5, R6}  & $\text{R5} \leftarrow [\text{R5}]-[\text{R6}]$ & \code{011\_101\_110} & \code{356} & \code{0EE} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\reportfigure[4.6cm]{lab4_exp2_rtl.png}
+  {RTL Viewer của hệ thống \code{lab4\_exp2\_top} (\code{counter5} $\rightarrow$ \code{my\_rom} $\rightarrow$ \code{proc})}
+  {fig:lab4_exp2_rtl}
+  {Mở \texttt{lab4\_exp2\_proc\_rom.qpf} $\rightarrow$ \textbf{Analysis \& Synthesis} $\rightarrow$ \textbf{RTL Viewer}, chụp sơ đồ 3 khối kết nối và lưu thành \texttt{lab4\_exp2\_rtl.png}.}
+
+\reportfigure[5.0cm]{lab4_exp2_wave.png}
+  {Dạng sóng mô phỏng ModelSim của Lab 4 --- Exp 2 (\code{tb\_lab4\_exp2}) thực thi chương trình từ \code{my\_ROM.mif}}
+  {fig:lab4_exp2_wave}
+  {Chạy \texttt{do run\_sim.do} trong \texttt{lab4\_exp2\_proc\_rom/sim}, gõ \texttt{configure wave -signalnamewidth 1} để hiển thị rõ tên tín hiệu, chụp lưu thành \texttt{lab4\_exp2\_wave.png}.}
+
+\newpage
+
+% ============================================================================
+% PHẦN 2: LAB 5 - BỘ XỬ LÝ CẢI TIẾN & HỆ THỐNG FPGA DE10-STANDARD
+% ============================================================================
+\section{Lab 5: Bộ xử lý cải tiến và Triển khai trên FPGA DE10-Standard}
+
+\subsection{Cải tiến kiến trúc Enhanced Processor (\code{proc\_enhanced})}
+So với bộ xử lý ở Lab 4, \code{proc\_enhanced} loại bỏ bộ đếm địa chỉ rời bên ngoài và hỗ trợ giao tiếp đồng bộ với bộ nhớ RAM cùng ngoại vi ánh xạ bộ nhớ (memory-mapped I/O):
+\begin{enumerate}
+  \item \textbf{Thanh ghi \code{R7} đóng vai trò Program Counter (\code{pc\_counter}):} Bộ đếm 9-bit tích hợp sẵn trong tập thanh ghi, có \code{Resetn} (xóa về \code{0}), ngõ tăng \code{incr\_pc} tự động cộng 1 khi nạp lệnh/hằng số, và ngõ nạp song song \code{R7in} cho phép thực hiện nhảy (\code{mv R7, Ry}, \code{mvi R7, \#addr}, \code{mvnz R7, Ry}).
+  \item \textbf{Bổ sung giao diện bộ nhớ ngoài:} Thanh ghi địa chỉ \code{ADDR[8:0]} (\code{ADDRin}), thanh ghi dữ liệu ghi \code{DOUT[8:0]} (\code{DOUTin}) và Flip-Flop 1-bit \code{W} (nhận \code{W\_D} từ FSM, reset về \code{0} khi \code{Resetn = 0}).
+  \item \textbf{Mở rộng tập lệnh lên 7 lệnh:} Bổ sung \code{ld} (đọc bộ nhớ), \code{st} (ghi bộ nhớ/ngoại vi) và \code{mvnz} (gán/nhảy có điều kiện khi thanh ghi \code{G != 0}, kiểm tra trực tiếp bằng phép OR rút gọn \code{|G}).
+\end{enumerate}
+
+\begin{table}[H]
+  \centering
+  \caption{Tập lệnh mở rộng 7 lệnh của Enhanced Processor (Lab 5)}
+  \label{tab:lab5_isa}
+  \small
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabularx}{\linewidth}{@{}c l X c@{}}
+    \toprule
+    \textbf{Opcode} & \textbf{Lệnh Assembly} & \textbf{Hoạt động thực thi} & \textbf{Số chu kỳ} \\
+    \midrule
+    \code{000} & \code{mv Rx, Ry}     & $\text{Rx} \leftarrow [\text{Ry}]$ & 4 (\code{T0}--\code{T3}) \\
+    \code{001} & \code{mvi Rx, \#D}   & $\text{Rx} \leftarrow \text{Mem}[\text{PC}]$; $\text{PC} \leftarrow \text{PC} + 1$ & 6 (\code{T0}--\code{T5}) \\
+    \code{010} & \code{add Rx, Ry}    & $\text{G} \leftarrow [\text{Rx}] + [\text{Ry}]$; $\text{Rx} \leftarrow \text{G}$ & 6 (\code{T0}--\code{T5}) \\
+    \code{011} & \code{sub Rx, Ry}    & $\text{G} \leftarrow [\text{Rx}] - [\text{Ry}]$; $\text{Rx} \leftarrow \text{G}$ & 6 (\code{T0}--\code{T5}) \\
+    \code{100} & \code{ld Rx, [Ry]}   & $\text{Rx} \leftarrow \text{Mem}[[\text{Ry}]]$ & 6 (\code{T0}--\code{T5}) \\
+    \code{101} & \code{st Rx, [Ry]}   & $\text{Mem/Peripheral}[[\text{Ry}]] \leftarrow [\text{Rx}]$ & 6 (\code{T0}--\code{T5}) \\
+    \code{110} & \code{mvnz Rx, Ry}   & Nếu $\text{G} \neq 0$ thì $\text{Rx} \leftarrow [\text{Ry}]$ (dùng cho vòng lặp khi \code{Rx = R7}) & 4 (\code{T0}--\code{T3}) \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Thiết kế FSM 6 trạng thái (\code{T0}--\code{T5}) và đồng bộ thời gian với RAM}
+Khối bộ nhớ \code{RAM: 1-PORT} trên FPGA Cyclone V có \textbf{ngõ vào được chốt qua thanh ghi} (\code{address}, \code{data}, \code{wren}) và \textbf{ngõ ra tổ hợp không chốt} (\code{q}). Vì vậy, sau khi CPU chốt địa chỉ ra \code{ADDR}, cần thêm \textbf{1 chu kỳ chờ} để thanh ghi địa chỉ bên trong RAM chốt \code{ADDR} trước khi dữ liệu trên \code{DIN} ổn định:
+\begin{itemize}
+  \item \textbf{Chu kỳ nạp lệnh (\code{T0}--\code{T2}):} \code{T0} đưa \code{PC} ra \code{ADDR} và tăng \code{PC}; \code{T1} chờ RAM chốt \code{ADDR}; \code{T2} chốt mã lệnh hợp lệ từ \code{DIN} vào \code{IR}.
+  \item \textbf{Chu kỳ thực thi (\code{T3}--\code{T5}):} Các lệnh không cần thêm truy xuất RAM hay ALU (\code{mv}, \code{mvnz}) kết thúc tại \code{T3}. Các lệnh còn lại đi qua \code{T4} (chờ RAM với \code{mvi}/\code{ld}; tính ALU với \code{add}/\code{sub}; chốt \code{DOUT} và đặt \code{W\_D = 1} với \code{st}) rồi hoàn tất tại \code{T5} (\code{Done = 1}).
+\end{itemize}
+
+% --- Sơ đồ FSM Lab 5 vẽ sẵn bằng TikZ ---
+\begin{figure}[H]
+  \centering
+  \resizebox{0.98\linewidth}{!}{%
+    \begin{tikzpicture}[
+      font=\small,
+      >=Stealth,
+      state/.style={circle, draw=hcmutBlue, very thick, fill=hcmutLight, minimum size=1.08cm, font=\bfseries\color{hcmutBlue}}
+    ]
+      \node[state] (T0) at (0, 0) {T0};
+      \node[state] (T1) at (3.2, 0) {T1};
+      \node[state] (T2) at (6.4, 0) {T2};
+      \node[state] (T3) at (9.6, 0) {T3};
+      \node[state] (T4) at (13.0, 0) {T4};
+      \node[state] (T5) at (16.2, 0) {T5};
+
+      \draw[->, thick] (-2.1, 0) -- node[above, pos=0.40] {\scriptsize \code{Resetn=0}} (T0);
+      \draw[->, thick] (T0) edge[loop above, looseness=6] node[above] {\scriptsize \code{Run=0}} (T0);
+
+      \draw[->, thick] (T0) -- node[above] {\scriptsize \code{Run=1}} node[below] {\scriptsize \code{ADDR$\leftarrow$PC}} (T1);
+      \draw[->, thick] (T1) -- node[above] {\scriptsize chờ RAM} (T2);
+      \draw[->, thick] (T2) -- node[above] {\scriptsize \code{IR$\leftarrow$DIN}} (T3);
+      \draw[->, thick] (T3) -- node[above] {\scriptsize \code{Done=0}} node[below=1pt, align=center] {\scriptsize \code{mvi, add, sub}\\\scriptsize \code{ld, st}} (T4);
+      \draw[->, thick] (T4) -- node[above] {\scriptsize luôn chuyển} (T5);
+
+      \draw[->, thick, hcmutBlue] (T3.north) to[bend right=25] node[above] {\scriptsize \code{mv, mvnz} (\code{Done=1})} (T0.north east);
+      \draw[->, thick, hcmutBlue] (T5.south) to[bend left=20] node[below] {\scriptsize \code{Done=1} (hoàn tất ghi \code{Rx} hoặc ghi RAM/LEDs)} (T0.south);
+    \end{tikzpicture}%
+  }
+  \caption{Biểu đồ chuyển trạng thái FSM 6 trạng thái của Enhanced Processor (Lab 5 --- \code{T0}--\code{T5})}
+  \label{fig:lab5_fsm}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{Bảng điều khiển FSM 6 trạng thái của \code{proc\_enhanced}}
+  \label{tab:lab5_fsm}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabularx}{\linewidth}{@{}c l l X@{}}
+    \toprule
+    \textbf{Bước} & \textbf{Lệnh} & \textbf{Tín hiệu tích cực (\code{= 1})} & \textbf{Ghi chú hoạt động / Timing} \\
+    \midrule
+    \code{T0} & Mọi lệnh (\code{Run=1}) & \code{R7out}, \code{ADDRin}, \code{incr\_pc} & Chốt \code{ADDR <= PC}, tăng \code{PC} (khi \code{Run=0} giữ nguyên \code{PC}) \\
+    \code{T1} & Mọi lệnh & \textit{(chờ)} & RAM chốt \code{ADDR} tại cạnh lên kết thúc \code{T1} $\rightarrow$ \code{DIN} có mã lệnh \\
+    \code{T2} & Mọi lệnh & \code{IRin} & Chốt mã lệnh từ \code{DIN} vào \code{IR} \\
+    \midrule
+    \code{T3} & \code{mv} (\code{000}) & \code{Rout=Yreg}, \code{Rin=Xreg}, \code{Done} & Hoàn tất trong 4 chu kỳ (\code{T0}--\code{T3}) \\
+    \code{T3} & \code{mvnz} (\code{110}) & Nếu \code{|G}: \code{Rout=Yreg}, \code{Rin=Xreg}; luôn \code{Done} & Kiểm tra kết quả ALU khác 0 để quyết định ghi \code{Rx} (hoặc nhảy \code{R7}) \\
+    \code{T3} & \code{mvi} (\code{001}) & \code{R7out}, \code{ADDRin}, \code{incr\_pc} & Xuất địa chỉ hằng số ra \code{ADDR}, tăng \code{PC} \\
+    \code{T3} & \code{add}, \code{sub} & \code{Rout=Xreg}, \code{Ain} & Nạp toán hạng thứ nhất vào thanh ghi \code{A} \\
+    \code{T3} & \code{ld}, \code{st} & \code{Rout=Yreg}, \code{ADDRin} & Đưa địa chỉ đích \code{[Ry]} ra \code{ADDR} \\
+    \midrule
+    \code{T4} & \code{mvi}, \code{ld} & \textit{(chờ)} & RAM chốt địa chỉ dữ liệu/hằng số $\rightarrow$ \code{DIN} ổn định \\
+    \code{T4} & \code{add} / \code{sub} & \code{Rout=Yreg}, \code{Gin} (\code{AddSub=0/1}) & Tính \code{A $\pm$ Ry} và chốt vào \code{G} \\
+    \code{T4} & \code{st} (\code{101}) & \code{Rout=Xreg}, \code{DOUTin}, \code{W\_D} & Chốt \code{DOUT <= Rx} và \code{W <= 1} cho chu kỳ \code{T5} \\
+    \midrule
+    \code{T5} & \code{mvi}, \code{ld} & \code{DINout}, \code{Rin=Xreg}, \code{Done} & Nạp dữ liệu từ \code{DIN} vào \code{Rx} \\
+    \code{T5} & \code{add}, \code{sub} & \code{Gout}, \code{Rin=Xreg}, \code{Done} & Ghi kết quả từ \code{G} vào \code{Rx} \\
+    \code{T5} & \code{st} (\code{101}) & \code{Done} (\code{W\_D = 0}) & \code{W = 1} suốt \code{T5} để RAM/LEDs chốt ghi tại cạnh lên, rồi xóa \code{W <= 0} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Kiểm chứng Enhanced Processor độc lập (Lab 5 --- Project 1)}
+Testbench \code{tb\_proc\_enhanced.sv} mô phỏng bộ xử lý độc lập nối với mảng RAM mô hình và thanh ghi LED giả lập, kiểm tra toàn bộ 7 lệnh (nạp hằng số \code{mvi}, ghi RAM \code{st} tại \code{0x040}, đọc lại bằng \code{ld}, cộng \code{add}, xuất LED tại \code{0x080}, lưu địa chỉ vòng lặp \code{mv R0, R7}, đếm lùi \code{sub} và nhảy có điều kiện \code{mvnz R7, R0} 3 vòng rồi thoát vòng lặp). Kết quả ModelSim đạt \textcolor{passGreen}{\textbf{ALL TESTS PASSED (0 errors, 0 warnings)}}; tổng hợp Quartus 18.1 đạt \textbf{0 errors, 0 warnings}.
+
+\reportfigure[4.5cm]{lab5_p1_rtl.png}
+  {RTL Viewer của bộ xử lý cải tiến \code{proc\_enhanced} (Lab 5 --- Project 1)}
+  {fig:lab5_p1_rtl}
+  {Mở \texttt{lab5\_exp1\_proc\_enhanced.qpf} $\rightarrow$ \textbf{Analysis \& Synthesis} $\rightarrow$ \textbf{RTL Viewer}, chụp lưu thành \texttt{lab5\_p1\_rtl.png}.}
+
+\reportfigure[5.1cm]{lab5_p1_wave.png}
+  {Dạng sóng mô phỏng ModelSim kiểm chứng đủ 7 lệnh của \code{proc\_enhanced} (\code{tb\_proc\_enhanced})}
+  {fig:lab5_p1_wave}
+  {Chạy \texttt{do run\_sim.do} trong \texttt{lab5\_exp1\_proc\_enhanced/sim}, gõ \texttt{configure wave -signalnamewidth 1} rồi chụp lưu thành \texttt{lab5\_p1\_wave.png}.}
+
+\subsection{Hệ thống hoàn chỉnh RAM 1-PORT, LEDs và Đồng bộ hóa trên DE10-Standard}
+Hệ thống top-level \code{lab5\_system\_top.sv} kết nối \code{proc\_enhanced} với bộ nhớ và ngoại vi theo không gian địa chỉ 9-bit (\code{ADDR[8:0]}) đúng hướng dẫn của giảng viên:
+\begin{itemize}
+  \item \textbf{Vùng bộ nhớ RAM (\code{A8A7 = 00}):} Tín hiệu cho phép ghi \code{mem\_wr\_en = $\sim$(ADDR[8] | ADDR[7]) \& W}. Bộ nhớ \code{ram128x9} (\code{128 words $\times$ 9-bit}) nhận 7 bit địa chỉ thấp \code{ADDR[6:0]}, dữ liệu ghi \code{DOUT[8:0]} và xuất \code{q[8:0]} (unregistered) về \code{DIN[8:0]}. Trên Cyclone V, Quartus tự động tổng hợp vào đúng \textbf{1 khối M10K (\code{altsyncram})}.
+  \item \textbf{Vùng thanh ghi ngoại vi LEDs (\code{A8A7 = 01}):} Tín hiệu cho phép ghi \code{led\_en = ($\sim$ADDR[8] \& ADDR[7]) \& W}. Thanh ghi 9-bit \code{u\_leds\_reg} chốt dữ liệu từ \code{DOUT[8:0]} mỗi khi CPU thực thi \code{st} vào địa chỉ \code{0x080}, xuất trực tiếp ra 9 LED đỏ \code{LEDR[8:0]}.
+  \item \textbf{Mạch đồng bộ 2 Flip-Flop (\code{run\_sync}):} Vì công tắc gạt \code{SW[9]} (\code{Run}) là tín hiệu bất đồng bộ với xung nhịp \code{CLOCK\_50}, tín hiệu được đưa qua chuỗi 2 D-FF nối tiếp để triệt tiêu trạng thái siêu ổn định (metastability).
+\end{itemize}
+
+% --- Sơ đồ khối hệ thống Lab 5 vẽ sẵn bằng TikZ ---
+\begin{figure}[H]
+  \centering
+  \resizebox{0.98\linewidth}{!}{%
+    \begin{tikzpicture}[
+      font=\footnotesize,
+      >=Stealth,
+      blk/.style={draw=hcmutBlue, very thick, fill=hcmutLight, align=center, rounded corners=3pt},
+      gate/.style={draw=hcmutBlue!80!black, thick, fill=white, align=center, rounded corners=2pt}
+    ]
+      % Inputs left
+      \node[align=right] (sw9) at (-4.3, 1.35) {\code{SW[9]}\\\scriptsize(\code{Run})};
+      \node[blk, minimum width=2.1cm, minimum height=0.95cm] (sync) at (-1.8, 1.35) {\textbf{2-FF Sync}\\\code{run\_sync}};
+      \node[align=right] (key0) at (-4.3, 0.0) {\code{KEY[0]}\\\scriptsize(\code{Resetn})};
+      \node[align=right] (clk50) at (-4.3, -1.15) {\code{CLOCK\_50}\\\scriptsize(50 MHz)};
+
+      % Processor
+      \node[blk, minimum width=3.3cm, minimum height=3.3cm] (cpu) at (2.8, 0.2) {\textbf{Enhanced Processor}\\\code{u\_proc}\\\scriptsize(\code{proc\_enhanced})};
+
+      % Address Decoder
+      \node[gate, minimum width=3.4cm, minimum height=1.25cm] (dec) at (8.3, 0.2) {\textbf{Address Decoder}\\\scriptsize \code{A8A7=00 $\rightarrow$ mem\_wr\_en}\\\scriptsize \code{A8A7=01 $\rightarrow$ led\_en}};
+
+      % RAM & LEDs stacked on right
+      \node[blk, minimum width=3.6cm, minimum height=1.6cm] (ram) at (14.8, 1.45) {\textbf{RAM 1-PORT (M10K)}\\\code{u\_ram (128 $\times$ 9)}\\\scriptsize \code{program\_fpga.mif}};
+      \node[blk, minimum width=3.6cm, minimum height=1.25cm] (leds) at (14.8, -1.1) {\textbf{LEDs Register}\\\code{u\_leds\_reg (9-bit)}};
+
+      % LED output
+      \node[align=left] (ledout) at (18.2, -1.1) {\textbf{\code{LEDR[8:0]}}};
+
+      % Wiring inputs
+      \draw[->, thick] (sw9.east) -- (sync.west);
+      \draw[->, thick] (sync.east) -- node[above=2pt] {\scriptsize \code{Run\_sync}} ([yshift=1.15cm]cpu.west);
+      \draw[->, thick] (key0.east) -- ([yshift=-0.2cm]cpu.west);
+      \draw[->, thick] (clk50.east) -- ([yshift=-1.35cm]cpu.west);
+      \draw[->, dashed, gray] (-3.2, -1.15) |- (sync.south);
+      \draw[->, dashed, gray] (-3.2, -1.15) -- (-3.2, -2.25) -| (leds.south);
+      \draw[->, dashed, gray] ([xshift=1.0cm]ram.east) node[right, gray] {\scriptsize \code{CLOCK\_50}} -- (ram.east);
+
+      % Wiring CPU -> Decoder / RAM / LEDs
+      \draw[->, very thick] ([yshift=1.0cm]cpu.east) -- node[above=2pt, pos=0.42] {\scriptsize \code{ADDR[8:0]}} (5.95, 1.2) |- ([yshift=0.3cm]dec.west);
+      \draw[->, very thick] (5.95, 1.2) |- ([yshift=0.45cm]ram.west) node[pos=0.76, above=1pt] {\scriptsize \code{ADDR[6:0]}};
+
+      \draw[->, thick] ([yshift=-0.1cm]cpu.east) -- node[above=1pt] {\scriptsize \code{W}} ([yshift=-0.1cm]dec.west);
+
+      \draw[->, very thick] ([yshift=-1.15cm]cpu.east) -- node[below=2pt, pos=0.32] {\scriptsize \code{DOUT[8:0]}} (11.1, -0.95) |- ([yshift=-0.15cm]ram.west);
+      \draw[->, very thick] (11.1, -0.95) |- ([yshift=-0.25cm]leds.west);
+
+      % Decoder outputs
+      \draw[->, thick, hcmutBlue] ([yshift=0.25cm]dec.east) -- ++(0.45, 0) |- ([yshift=-0.55cm]ram.west) node[pos=0.72, below=1pt] {\scriptsize \code{mem\_wr\_en}};
+      \draw[->, thick, hcmutBlue] ([yshift=-0.25cm]dec.east) -- ++(0.45, 0) |- ([yshift=0.3cm]leds.west) node[pos=0.72, above=1pt] {\scriptsize \code{led\_en}};
+
+      % RAM q -> DIN feedback
+      \draw[->, very thick] (ram.north) -- ++(0, 0.55) -| node[pos=0.25, above=1pt] {\scriptsize \code{DIN[8:0]} (unregistered \code{q})} (cpu.north);
+
+      % LED output arrow
+      \draw[->, very thick] (leds.east) -- (ledout.west);
+    \end{tikzpicture}%
+  }
+  \caption{Sơ đồ khối hệ thống đầy đủ \code{lab5\_system\_top} triển khai trên DE10-Standard}
+  \label{fig:lab5_sys}
+\end{figure}
+
+Chương trình demo nạp trong \code{program\_fpga.mif} (theo Figure 3 của tài liệu Lab 5) dùng thanh ghi \code{R2} làm bộ đếm nhị phân ghi ra \code{LEDs} (\code{ADDR = 0x080}), sau đó tạo trễ bằng hai vòng lặp lồng nhau \code{511 $\times$ 511} (\code{R3}, \code{R4} đếm lùi nhờ cặp lệnh \code{sub} + \code{mvnz R7, R0/R5}), tạo tốc độ tăng LED khoảng \textbf{19 bước/giây} ở xung nhịp 50 MHz giúp quan sát rõ trên kit. Bản mô phỏng \code{program\_sim.mem} giữ nguyên cấu trúc lệnh nhưng rút gọn hệ số trễ xuống \code{2 $\times$ 2} để dễ quan sát nhiều chu kỳ đếm trên ModelSim.
+
+\begin{table}[H]
+  \centering
+  \caption{Bảng gán chân FPGA trên kit Terasic DE10-Standard (\code{5CSXFC6D6F31C6}, chuẩn \code{3.3-V LVTTL})}
+  \label{tab:de10_pins}
+  \small
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabularx}{\linewidth}{@{}l l X@{}}
+    \toprule
+    \textbf{Tín hiệu} & \textbf{Chức năng} & \textbf{Chân FPGA (DE10-Standard)} \\
+    \midrule
+    \code{CLOCK\_50} & Xung nhịp hệ thống 50 MHz & \code{PIN\_AF14} \\
+    \code{KEY[0]}    & \code{Resetn} (nút nhấn tích cực mức thấp) & \code{PIN\_AJ4} \\
+    \code{SW[9]}     & \code{Run} (công tắc gạt, qua mạch \code{run\_sync}) & \code{PIN\_AA30} \\
+    \code{LEDR[8:0]} & Ngõ ra thanh ghi LEDs 9-bit (bit 8 $\rightarrow$ bit 0) & \code{AB22, AF24, AE24, AF25, AG25, AD24, AC23, AB23, AA24} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\reportfigure[4.8cm]{lab5_p2_rtl.png}
+  {RTL Viewer mức hệ thống \code{lab5\_system\_top} (thấy rõ \code{u\_run\_sync}, \code{u\_proc}, mạch giải mã địa chỉ, \code{u\_ram}, \code{u\_leds\_reg})}
+  {fig:lab5_p2_rtl}
+  {Mở \texttt{lab5\_exp1\_system\_fpga.qpf} $\rightarrow$ \textbf{Compile Design} $\rightarrow$ \textbf{RTL Viewer}, chụp lưu thành \texttt{lab5\_p2\_rtl.png}.}
+
+\reporttwofigures[4.2cm]
+  {lab5_p2_wave_overview.png}
+  {Toàn cảnh hoạt động (\code{0--15500 ns}): \code{LEDR} đếm \code{0$\rightarrow$1$\rightarrow$2$\rightarrow$3$\rightarrow$4}, tạm dừng khi \code{SW[9]=0}, chạy tiếp lên \code{5} và reset về \code{0$\rightarrow$1} khi nhấn \code{KEY[0]=0}.}
+  {Chụp tổng quan \texttt{tb\_lab5\_system} sau khi gõ \texttt{configure wave -signalnamewidth 1} (có thể ẩn tạm các dòng \code{CLOCK\_50, Tstep\_Q, IR, ADDR} để ảnh tổng quan thật sạch).}
+  {lab5_p2_wave_zoom.png}
+  {Phóng to cận cảnh chu kỳ ghi LED (\code{ADDR=0x080}, \code{W=1}, \code{led\_en=1}) và độ trễ đồng bộ 2-FF của \code{Run\_sync}.}
+  {Gõ \texttt{wave zoom range 9650ns 10200ns} (hoặc \texttt{2750ns 3050ns}) trong ModelSim Transcript rồi chụp lưu thành \texttt{lab5\_p2\_wave\_zoom.png}.}
+  {Dạng sóng mô phỏng ModelSim toàn hệ thống \code{lab5\_system\_top} (\code{tb\_lab5\_system})}
+  {fig:lab5_p2_wave}
+
+\subsection{Kết quả Tổng hợp, Phân tích Thời gian (50 MHz) và Thực nghiệm trên Kit}
+Quá trình biên dịch đầy đủ (\textit{Full Compilation}) cho \code{lab5\_exp1\_system\_fpga} trên Quartus Prime 18.1 Lite với ràng buộc thời gian \code{lab5\_system\_top.sdc} (\code{create\_clock -period 20.000 [get\_ports CLOCK\_50]}) hoàn tất với \textbf{0 errors}, tổng hợp đúng 1 khối RAM cứng M10K và thỏa toàn bộ điều kiện thời gian với hệ số an toàn hơn 2 lần.
+
+\begin{table}[H]
+  \centering
+  \caption{Tài nguyên phần cứng sử dụng trên Intel Cyclone V \code{5CSXFC6D6F31C6} (Fitter Summary)}
+  \label{tab:fitter}
+  \small
+  \renewcommand{\arraystretch}{1.1}
+  \begin{tabular}{@{}l r r@{}}
+    \toprule
+    \textbf{Hạng mục tài nguyên} & \textbf{Sử dụng / Tổng số} & \textbf{Tỉ lệ} \\
+    \midrule
+    Logic utilization (ALMs) & 105 / 41,910 & $< 1\%$ \\
+    Total registers (Flip-Flops) & 140 & --- \\
+    Total block memory bits (\code{altsyncram}, \code{UNREGISTERED}) & 1,152 / 5,662,720 & $< 1\%$ \\
+    Total RAM Blocks (M10K) & 1 / 553 & $< 1\%$ \\
+    Total I/O pins & 12 / 499 & $2\%$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \caption{Kết quả phân tích thời gian TimeQuest Timing Analyzer (\code{CLOCK\_50 = 50 MHz}, chu kỳ \code{20.000 ns})}
+  \label{tab:timing}
+  \footnotesize
+  \setlength{\tabcolsep}{5pt}
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{@{}X c c c c c@{}}
+    \toprule
+    \textbf{Mô hình Timing (PVT Corner)} & \textbf{Fmax} & \textbf{Setup (ns)} & \textbf{Hold (ns)} & \textbf{MPW (ns)} & \textbf{Kết quả} \\
+    \midrule
+    Slow 1100mV 85$^\circ$C & \textbf{101.81 MHz} & $+10.178$ & $+0.206$ & $+8.960$ & \textcolor{passGreen}{\textbf{PASS}} \\
+    Slow 1100mV 0$^\circ$C  & \textbf{100.94 MHz} & $+10.093$ & $+0.193$ & $+8.992$ & \textcolor{passGreen}{\textbf{PASS}} \\
+    Fast 1100mV 85$^\circ$C & ---                 & $+14.485$ & $+0.134$ & $+8.534$ & \textcolor{passGreen}{\textbf{PASS}} \\
+    Fast 1100mV 0$^\circ$C  & ---                 & $+14.896$ & $+0.121$ & $+8.484$ & \textcolor{passGreen}{\textbf{PASS}} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{itemize}
+  \item \textbf{Đánh giá Timing:} Tần số hoạt động tối đa ở điều kiện khắc nghiệt nhất (Slow 1100mV 0$^\circ$C) đạt \textbf{100.94 MHz} ($> 2\times$ yêu cầu 50 MHz), toàn bộ các đường dữ liệu có tổng vi phạm âm \code{TNS = 0.000 ns}, \textbf{0 lỗi và 0 cảnh báo Timing}.
+  \item \textbf{Đánh giá siêu ổn định (Metastability Report):} Công cụ nhận diện đúng chuỗi đồng bộ 2 tầng \code{u\_run\_sync}, đạt \textbf{Worst-Case MTBF = \code{1e+09} năm}, đảm bảo an toàn tuyệt đối khi gạt \code{SW[9]}.
+\end{itemize}
+
+\reportfigure[4.8cm]{lab5_timing.png}
+  {Báo cáo TimeQuest Timing Analyzer (Fmax Summary, Setup/Hold Slack và Metastability) trong Quartus 18.1}
+  {fig:lab5_timing}
+  {Trong Quartus 18.1 sau khi Compile \texttt{lab5\_exp1\_system\_fpga}, mở \textbf{Compilation Report $\rightarrow$ TimeQuest Timing Analyzer}, chụp bảng Fmax \& Setup/Hold Summary lưu thành \texttt{lab5\_timing.png}.}
+
+\reportfigure[5.0cm]{lab5_de10_demo.jpg}
+  {Thực nghiệm nạp bitstream \code{lab5\_exp1\_system\_fpga.sof} chạy thực tế trên kit Terasic DE10-Standard}
+  {fig:lab5_de10_demo}
+  {Chụp cận cảnh board DE10-Standard khi đang chạy chương trình đếm nhị phân trên \texttt{LEDR[8:0]} (thấy rõ \texttt{SW[9]} và \texttt{KEY[0]}), lưu thành \texttt{lab5\_de10\_demo.jpg}.}
+
+\todobox{NHẬN XÉT THỰC NGHIỆM TRÊN KIT DE10-STANDARD (TỰ ĐIỀN SAU KHI NẠP BOARD)}{%
+  Mô tả ngắn gọn (3--4 dòng) kết quả quan sát thực tế sau khi nạp file \texttt{lab5\_exp1\_system\_fpga.sof} bằng Quartus Programmer:
+  (1) Khi \texttt{SW[9] = 0} và nhấn \texttt{KEY[0]}, toàn bộ \texttt{LEDR[8:0]} tắt;
+  (2) Khi gạt \texttt{SW[9] = 1}, dãy \texttt{LEDR[8:0]} đếm nhị phân ổn định ở tốc độ thực tế quan sát được;
+  (3) Khi gạt \texttt{SW[9] = 0}, giá trị giữ nguyên ổn định không nhấp nháy lỗi, gạt lại \texttt{1} đếm tiếp, nhấn \texttt{KEY[0]} reset về 0.
+}
+
+\newpage
+
+% ============================================================================
+% PHẦN 3: KẾT LUẬN
+% ============================================================================
+\section{Kết luận và Đánh giá hoàn thành}
+Qua quá trình thực hiện bài tập lớn Học phần mở rộng Kỹ Thuật Số (\code{EE1009}), toàn bộ các yêu cầu của Lab 4 và Lab 5 đã được hoàn thiện, kiểm chứng bằng mô phỏng và tổng hợp phần cứng:
+\begin{itemize}
+  \item \textbf{Lab 4 (Exp 1 \& Exp 2):} Thiết kế hoàn chỉnh bộ xử lý đơn giản 9-bit (\code{proc}) gồm 4 lệnh, FSM 4 trạng thái \code{T0}--\code{T3}, tích hợp bộ đếm 5-bit và bộ nhớ chỉ đọc \code{32 $\times$ 9 ROM} nạp chương trình Pre-Lab 4 Exercise 1. Mô phỏng ModelSim đạt 100\% test case (0 errors, 0 warnings) và tổng hợp Quartus 18.1 không lỗi.
+  \item \textbf{Lab 5 (Enhanced Processor \& Full System):} Thiết kế bộ xử lý cải tiến 7 lệnh với \code{R7 = PC} và FSM 6 trạng thái \code{T0}--\code{T5}, tích hợp \code{RAM 1-PORT 128 $\times$ 9} trên khối M10K (\code{A8A7 = 00}), thanh ghi ngoại vi \code{LEDs} (\code{A8A7 = 01}) và mạch đồng bộ 2-FF cho \code{SW[9]}. Hệ thống đạt \textbf{Fmax = 100.94 MHz} (vượt xa mục tiêu \textbf{50 MHz}) với \code{TNS = 0.000 ns} và tiêu thụ dưới 1\% tài nguyên FPGA Cyclone V.
+\end{itemize}
+
+\begin{table}[H]
+  \centering
+  \caption{Bảng kiểm tra mức độ hoàn thành các hạng mục nộp bài}
+  \label{tab:checklist}
+  \small
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{@{}c X c@{}}
+    \toprule
+    \textbf{STT} & \textbf{Hạng mục yêu cầu} & \textbf{Trạng thái} \\
+    \midrule
+    1 & Thiết kế RTL, testbench \& mô phỏng ModelSim cho Lab 4 (Exp 1 \& Exp 2) & \textcolor{passGreen}{\textbf{Hoàn thành}} \\
+    2 & Thiết kế RTL, testbench \& mô phỏng ModelSim cho Lab 5 (Processor \& Hệ thống) & \textcolor{passGreen}{\textbf{Hoàn thành}} \\
+    3 & Tổng hợp Quartus 18.1, gán chân DE10-Standard và Timing Analyzer @ 50 MHz & \textcolor{passGreen}{\textbf{Hoàn thành}} \\
+    4 & Nạp chạy thực tế trên kit DE10-Standard \& quay Video demo & \todo{Cập nhật: Hoàn thành} \\
+    5 & Hoàn thiện báo cáo PDF ($\leq 15$ trang) và đóng gói file \code{.zip} project & \todo{Cập nhật: Hoàn thành} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\todobox{BÀI HỌC RÚT RA \& GHI CHÚ CÁ NHÂN (TỰ ĐIỀN -- TÙY CHỌN 2--4 GẠCH ĐẦU DÒNG)}{%
+  Ví dụ gợi ý: (1) Hiểu rõ tầm quan trọng của timing bộ nhớ đồng bộ (chờ 1 chu kỳ chốt địa chỉ RAM 1-PORT khi thiết kế FSM \code{T0}--\code{T5});
+  (2) Nhận thức được vai trò của mạch đồng bộ 2-FF chống metastability cho tín hiệu nút nhấn/công tắc ở tần số 50 MHz;
+  (3) Kinh nghiệm tổ chức mã SystemVerilog theo chuẩn RTL và ràng buộc SDC trên Quartus Prime 18.1.
+}
+
+\end{document}

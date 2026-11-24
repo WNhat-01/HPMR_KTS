@@ -1,0 +1,23 @@
+% ============================================================================ %
+% File: my_ROM.mif                                                             %
+% Description: 32 x 9-bit ROM initialization file for Lab 4 Experiment 2       %
+%              Machine codes from Pre-Lab 4 Exercise 1                         %
+% ============================================================================ %
+DEPTH = 32;
+WIDTH = 9;
+ADDRESS_RADIX = UNS;
+DATA_RADIX = BIN;
+
+CONTENT
+BEGIN
+    0  : 000001100; % mv  R1, R4    (III=000, XXX=001, YYY=100) %
+    1  : 000011010; % mv  R3, R2    (III=000, XXX=011, YYY=010) %
+    2  : 001010000; % mvi R2, #5    (III=001, XXX=010, YYY=000) %
+    3  : 000000101; % #5            (+5 in 9-bit two's complement) %
+    4  : 001100000; % mvi R4, #-6   (III=001, XXX=100, YYY=000) %
+    5  : 111111010; % #-6           (-6 in 9-bit two's complement = 0x1FA) %
+    6  : 010011111; % add R3, R7    (III=010, XXX=011, YYY=111) %
+    7  : 010010000; % add R2, R0    (III=010, XXX=010, YYY=000) %
+    8  : 011101110; % sub R5, R6    (III=011, XXX=101, YYY=110) %
+    [9..31] : 000000000;
+END;

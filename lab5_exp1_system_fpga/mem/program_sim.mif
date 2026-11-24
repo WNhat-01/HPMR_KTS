@@ -1,0 +1,35 @@
+% ============================================================================ %
+% File: program_sim.mif                                                        %
+% Description: Fast-simulation version of Lab 5 Figure 3 Program               %
+%              Delay constants shortened to 2 (0x09=2, 0x0C=2) so counter      %
+%              increments are clearly visible in functional simulation         %
+% ============================================================================ %
+DEPTH = 128;
+WIDTH = 9;
+ADDRESS_RADIX = HEX;
+DATA_RADIX = BIN;
+
+CONTENT
+BEGIN
+    00 : 001001000; %        mvi  R1,#1          // initialize R1              %
+    01 : 000000001;
+    02 : 001010000; %        mvi  R2,#0          // counter to display on LEDs %
+    03 : 000000000;
+    04 : 001011000; % Loop:  mvi  R3,#010000000  // R3 = address of LEDs reg   %
+    05 : 010000000;
+    06 : 101010011; %        st   R2,R3          // write to LEDs              %
+    07 : 010010001; %        add  R2,R1          // increment counter for LEDs %
+    08 : 001011000; %        mvi  R3,#2          // short outer delay for sim  %
+    09 : 000000010;
+    0A : 000101111; %        mv   R5,R7          // save address of Outer (0B) %
+    0B : 001100000; % Outer: mvi  R4,#2          // short inner delay for sim  %
+    0C : 000000010;
+    0D : 000000111; %        mv   R0,R7          // save address of Inner (0E) %
+    0E : 011100001; % Inner: sub  R4,R1          // decrement inner loop var   %
+    0F : 110111000; %        mvnz R7,R0          // continue Inner if R4 != 0  %
+    10 : 011011001; %        sub  R3,R1          // decrement outer loop var   %
+    11 : 110111101; %        mvnz R7,R5          // continue Outer if R3 != 0  %
+    12 : 001111000; %        mvi  R7,#Loop       // execute again              %
+    13 : 000000100;
+    [14..7F] : 000000000;
+END;

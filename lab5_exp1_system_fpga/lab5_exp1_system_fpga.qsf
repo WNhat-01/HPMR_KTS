@@ -1,0 +1,75 @@
+# ============================================================================
+# Quartus Prime 18.1 Settings File - Lab 5 Full System (Processor + RAM + LEDs)
+# Target Board: Terasic DE10-Standard (Cyclone V SX SoC 5CSXFC6D6F31C6)
+# Clock: 50 MHz (CLOCK_50)
+# ============================================================================
+
+set_global_assignment -name FAMILY "Cyclone V"
+set_global_assignment -name DEVICE 5CSXFC6D6F31C6
+set_global_assignment -name TOP_LEVEL_ENTITY lab5_system_top
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.1.0
+set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Lite Edition"
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
+set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (SystemVerilog)"
+set_global_assignment -name EDA_OUTPUT_DATA_FORMAT "SYSTEMVERILOG HDL" -section_id eda_simulation
+set_global_assignment -name VERILOG_INPUT_VERSION SYSTEMVERILOG_2005
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+
+# Design Source Files
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/regn.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/dec3to8.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/addsub.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/pc_counter.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/proc_enhanced.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/run_sync.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/ram128x9.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/lab5_system_top.sv
+set_global_assignment -name MIF_FILE mem/program_fpga.mif
+set_global_assignment -name SDC_FILE constraints/lab5_system_top.sdc
+
+# ============================================================================
+# Terasic DE10-Standard Pin Assignments
+# ============================================================================
+
+# 50 MHz Clock Input
+set_location_assignment PIN_AF14 -to CLOCK_50
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLOCK_50
+
+# Push-Button KEY[0] -> Resetn (Active-Low)
+set_location_assignment PIN_AJ4 -to KEY[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to KEY[0]
+
+# Slide Switch SW[9] -> Run
+set_location_assignment PIN_AA30 -to SW[9]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SW[9]
+
+# Red LEDs LEDR[8:0] -> 9-bit Output Register
+set_location_assignment PIN_AA24 -to LEDR[0]
+set_location_assignment PIN_AB23 -to LEDR[1]
+set_location_assignment PIN_AC23 -to LEDR[2]
+set_location_assignment PIN_AD24 -to LEDR[3]
+set_location_assignment PIN_AG25 -to LEDR[4]
+set_location_assignment PIN_AF25 -to LEDR[5]
+set_location_assignment PIN_AE24 -to LEDR[6]
+set_location_assignment PIN_AF24 -to LEDR[7]
+set_location_assignment PIN_AB22 -to LEDR[8]
+
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[8]
+
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
